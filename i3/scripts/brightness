@@ -1,0 +1,21 @@
+#!/bin/bash
+
+DISP=eDP-1-1
+STEP=1
+
+brightness=$(xrandr --current --verbose | egrep "$DISP" -A5 | tail -n1 | awk '{print $2}' | cut -c 3- )
+
+case $BLOCK_BUTTON in
+  4) brightness=$(expr $brightness + $STEP) ;;
+  5) brightness=$(expr $brightness - $STEP) ;;
+esac
+
+if [ $brightness -lt 10 ]; then
+  brightness=10
+elif [ $brightness -gt 99 ]; then
+  brightness=99
+fi
+
+xrandr --output $DISP --brightness "0."$brightness
+
+echo ${brightness}%

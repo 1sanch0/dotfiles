@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Use: screenshot [-cfw] <destination>
+#         + -c:bool copy image to clipboard
+#         + -f:bool screenshot fullscreen
+#         + -w:bool screenshot focused window
+#         + -o:bool screenshot to stdout
+#         + destination: screenshot destination folder
+
+# Requires import (ImageMagick) and xdotool
+
+to_clipboard="false"
+to_stdout="false"
+fullscreen="false"
+window="false"
+
+destination_folder="/home/javie/Downloads" # Default
+
+while getopts cfwo flag
+do
+  case "${flag}" in
+    c) to_clipboard="true";;
+    f) fullscreen="true";;
+    w) window="true";;
+    o) to_stdout="true";;
+  esac
+done
+
+shift $(( OPTIND - 1 )) # Shift to end of getopts
+
+if [ "$1" != "" ]; then
+  destination_folder=$1
+fi
+
+if [ "$fullscreen" = "true" ]; then
+  cmd='import -window root'
+elif [ "$window" = "true" ]; then
+  cmd='import -window "$(xdotool getwindowfocus -f)"'
+else 
+  cmd='import'
+fi
+
+if [ "$to_clipboard" = "true" ]; then
+  cmd=${cmd}" png:- | xclip -selection clipboard -t image/png "
+elif [ "$to_stdout" = "true" ]; then
+  cmd=${cmd}" png:-"
+else
+  cmd=${cmd}" \"${destination_folder}/"$(date +"%T.%6N %d-%m-%Y")".png"'"'
+fi
+
+eval ${cmd}

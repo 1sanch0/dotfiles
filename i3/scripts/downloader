@@ -1,0 +1,41 @@
+#!/bin/bash
+
+#sed 's/&.*$//g'
+
+BACKEND=yt-dlp
+DOWNLOAD_FOLDER=/home/javie/Downloads
+
+
+url=$(xclip -o -selection clipboard)
+
+# maybe with other backend is different
+cmd="${BACKEND} '${url}' -o ${DOWNLOAD_FOLDER}/%(title)s.%(ext)s"
+
+#if $(BACKEND) ; then
+#else
+#fi
+
+SLUG=""
+
+case $BLOCK_BUTTON in # (1 = Left, 2 = Middle, 3 = Right, 4 = Scroll Up, 5 = Scroll Down, 6 = Custom, 7 = Custom, 8 = Upper Thumb, 9 = Lower Thumb, 10+ = Custom).
+  1) # only audio
+    cmd="${cmd} -f 'ba'"
+    SLUG="AUDIO ONLY"
+    ;; 
+  *) # default
+    SLUG="BEST"
+    ;;
+esac   
+
+echo $SLUG
+echo "#00FF00"
+
+cmd="! $cmd &> /dev/null"
+
+if ! $(cmd)
+then
+  echo "ERROR"
+  echo "#FF0000"
+fi
+
+
